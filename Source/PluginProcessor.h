@@ -9,6 +9,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "IIRFilter.h"
 
 //==============================================================================
 /**
@@ -54,6 +55,9 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
 private:
+    juce::AudioParameterFloat* mGain;
+    
+    std::unique_ptr<IIRFilter> iir;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (puannhiAudioProcessor)
 };

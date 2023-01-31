@@ -22,6 +22,7 @@ puannhiAudioProcessor::puannhiAudioProcessor()
                        )
 #endif
 {
+    addParameter(mGain = new juce::AudioParameterFloat("0x00", "Gain", 0.0f, 1.0f, 0.0f));
 }
 
 puannhiAudioProcessor::~puannhiAudioProcessor()
@@ -95,6 +96,9 @@ void puannhiAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBloc
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+    double b_coefficients[] = {0.00000104697434f, 0.00000418789734f, 0.00000628184601f, 0.00000418789734f, 0.00000104697434f};
+    double a_coefficients[] = {1.0f, -3.81500325f, 5.46175145f, -3.47773597f, 0.83100453f};
+    iir.reset(new IIRFilter(b_coefficients, a_coefficients));
 }
 
 void puannhiAudioProcessor::releaseResources()
@@ -132,29 +136,14 @@ bool puannhiAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) 
 void puannhiAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     juce::ScopedNoDenormals noDenormals;
-    auto totalNumInputChannels  = getTotalNumInputChannels();
-    auto totalNumOutputChannels = getTotalNumOutputChannels();
+    
+    auto* input = buffer.getReadPointer(0);
+    auto* output = buffer.getWritePointer(0);
 
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
-    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-        buffer.clear (i, 0, buffer.getNumSamples());
-
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
+    for(int i = 0; i < getBlockSize(); i++)
     {
-        auto* channelData = buffer.getWritePointer (channel);
-
-        // ..do something to the data...
+        auto gain = mGain->get();
+        output[i] = input[i] * gain;
     }
 }
 

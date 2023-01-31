@@ -4,6 +4,7 @@
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1">
   <MAINGROUP id="C0tjzm" name="FilterBank">
     <GROUP id="{BAC3507E-A872-09F0-EF39-1DA04089E57C}" name="Source">
+      <FILE id="LyICgF" name="IIRFilter.h" compile="0" resource="0" file="Source/IIRFilter.h"/>
       <FILE id="KUy1TJ" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="GuZ95M" name="PluginProcessor.h" compile="0" resource="0"
