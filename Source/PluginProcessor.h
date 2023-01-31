@@ -55,9 +55,11 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
 private:
-    juce::AudioParameterFloat* mGain;
+    juce::AudioParameterFloat* mGain0;
+    juce::AudioParameterFloat* mGain1;
     
-    std::unique_ptr<IIRFilter> iir;
+    std::unique_ptr<IIRFilter> iir0L;
+    std::unique_ptr<IIRFilter> iir0H;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (puannhiAudioProcessor)
 };

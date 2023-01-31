@@ -22,7 +22,8 @@ puannhiAudioProcessor::puannhiAudioProcessor()
                        )
 #endif
 {
-    addParameter(mGain = new juce::AudioParameterFloat("0x00", "Gain", 0.0f, 1.0f, 0.0f));
+    addParameter(mGain0 = new juce::AudioParameterFloat("0x00", "Gain0", 0.0f, 1.0f, 0.0f));
+    addParameter(mGain1 = new juce::AudioParameterFloat("0x01", "Gain1", 0.0f, 1.0f, 0.0f));
 }
 
 puannhiAudioProcessor::~puannhiAudioProcessor()
@@ -96,9 +97,13 @@ void puannhiAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBloc
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-    double b_coefficients[] = {0.00000104697434f, 0.00000418789734f, 0.00000628184601f, 0.00000418789734f, 0.00000104697434f};
+    double L_b_coefficients[] = {0.00000104697434f, 0.00000418789734f, 0.00000628184601f, 0.00000418789734f, 0.00000104697434f};
+    double H_b_coefficients[] = {0.91159345f, -3.6463738f, 5.4695607f, -3.6463738f, 0.91159345f};
+    
     double a_coefficients[] = {1.0f, -3.81500325f, 5.46175145f, -3.47773597f, 0.83100453f};
-    iir.reset(new IIRFilter(b_coefficients, a_coefficients));
+    
+    iir0L.reset(new IIRFilter(L_b_coefficients, a_coefficients));
+    iir0H.reset(new IIRFilter(H_b_coefficients, a_coefficients));
 }
 
 void puannhiAudioProcessor::releaseResources()
@@ -142,8 +147,9 @@ void puannhiAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
 
     for(int i = 0; i < getBlockSize(); i++)
     {
-        auto gain = mGain->get();
-        output[i] = input[i] * gain;
+        auto gain0 = mGain0->get();
+        auto gain1 = mGain1->get();
+        output[i] = iir0L->process_sample(input[i]) * gain0 + iir0H->process_sample(input[i]) * gain1;
     }
 }
 
