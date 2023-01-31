@@ -1,32 +1,13 @@
-# Prerequisites
-*.d
+# OS-generated files (OS X)
+*.DS_Store
+*.Spotlight-V100
+*.Trashes
+._*
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+# OS-generated files (Windows)
+desktop.ini
+ehthumbs.db
+Thumbs.db
 
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
+# Build Folder
+/Builds
