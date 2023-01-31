@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="FhdCS6" name="FilterBank" projectType="audioplug" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1">
+              addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
+              pluginName="FilterBank">
   <MAINGROUP id="C0tjzm" name="FilterBank">
     <GROUP id="{BAC3507E-A872-09F0-EF39-1DA04089E57C}" name="Source">
       <FILE id="LyICgF" name="IIRFilter.h" compile="0" resource="0" file="Source/IIRFilter.h"/>
@@ -18,8 +19,8 @@
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" targetName="NewProject"/>
-        <CONFIGURATION isDebug="0" name="Release" targetName="NewProject"/>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="FilterBank"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="FilterBank"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../JUCE/modules"/>
