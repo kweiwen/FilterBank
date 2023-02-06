@@ -10,6 +10,9 @@ public:
     template <size_t B, size_t A>
     IIRFilter(const double (&b)[B], const double (&_a)[A]) : lenB(B), lenA(A - 1)
     {
+        i_b = 0;
+        i_a = 0;
+
         x = new double[lenB]();
         y = new double[lenA]();
 
