@@ -57,9 +57,19 @@ public:
 private:
     juce::AudioParameterFloat* mGain0;
     juce::AudioParameterFloat* mGain1;
+    juce::AudioParameterFloat* mGain2;
+    juce::AudioParameterFloat* mGain3;
+    juce::AudioParameterFloat* mGain4;
     
     std::unique_ptr<IIRFilter> iir0L;
     std::unique_ptr<IIRFilter> iir0H;
+    std::unique_ptr<IIRFilter> iir1L;
+    std::unique_ptr<IIRFilter> iir1H;
+    std::unique_ptr<IIRFilter> iir2L;
+    std::unique_ptr<IIRFilter> iir2H;
+    std::unique_ptr<IIRFilter> iir3L;
+    std::unique_ptr<IIRFilter> iir3H;
+
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (puannhiAudioProcessor)
 };
