@@ -87,3 +87,45 @@ private:
     double *coeff_b;
     double *coeff_a;
 };
+
+class Complementary
+{
+public:
+    template <size_t N>
+    Complementary(const double(&b)[N], const double(&b_)[N], const double(&_a)[N])
+    {
+        F  = new IIRFilter(b, _a);
+        F_ = new IIRFilter(b_, _a);
+
+        accumulator = new double[N]();
+        //negator = new double[N]();
+        for (int i = 0; i < N; i++)
+        {
+            accumulator[i] = b[i] + b_[i];
+        }
+
+        //A  = IIRFilter(accumulator, _a);
+    }
+
+    void process_sample(double input_data, double* output_data)
+    {
+        output_data[0] = F->process_sample(input_data);
+        output_data[1] = F_->process_sample(input_data);
+    }
+
+    void process(double* input, double** output, int block_size)
+    {
+        for (int i = 0; i < block_size; i++)
+        {
+            output[0][i] = F->process_sample(input[i]);
+            output[1][i] = F_->process_sample(input[i]);
+        }
+    }
+    
+private:
+    IIRFilter* F;
+    IIRFilter* F_;
+    IIRFilter* A;
+    double* accumulator;
+    //double* negator;
+};

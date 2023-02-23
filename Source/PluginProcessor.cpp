@@ -102,8 +102,23 @@ void puannhiAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBloc
     
     double a_coefficients[] = {1.0f, -3.81500325f, 5.46175145f, -3.47773597f, 0.83100453f};
     
-    iir0L.reset(new IIRFilter(L_b_coefficients, a_coefficients));
-    iir0H.reset(new IIRFilter(H_b_coefficients, a_coefficients));
+    //iirL.reset(new IIRFilter[4]{
+    //    IIRFilter(L_b_coefficients, a_coefficients),
+    //    IIRFilter(L_b_coefficients, a_coefficients),
+    //    IIRFilter(L_b_coefficients, a_coefficients),
+    //    IIRFilter(L_b_coefficients, a_coefficients) });
+
+    CompF.reset(new Complementary(L_b_coefficients, H_b_coefficients, a_coefficients));
+
+    //F1  [array([-0.00100482, -0.00200964, -0.00100482]), array([1., -1.87320442, 0.8772237])]
+    //F2  [array([-0.0037837, -0.0075674, -0.0037837]), array([1., -1.75395293, 0.76908772])]
+    //F3  [array([-0.01353418, -0.02706837, -0.01353418]), array([1., -1.53465398, 0.58879071])]
+    //F1_ [array([0.93760703, -1.87521406, 0.93760703]), array([1., -1.87320442, 0.8772237])]
+    //F2_ [array([0.88076016, -1.76152032, 0.88076016]), array([1., -1.75395293, 0.76908772])]
+    //F3_ [array([0.78086117, -1.56172234, 0.78086117]), array([1., -1.53465398, 0.58879071])]
+    //A1  [array([0.93660221, -1.8772237, 0.93660221]), array([1., -1.87320442, 0.8772237])]
+    //A3  [array([0.76732699, -1.58879071, 0.76732699]), array([1., -1.53465398, 0.58879071])]
+
 }
 
 void puannhiAudioProcessor::releaseResources()
@@ -144,12 +159,15 @@ void puannhiAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     
     auto* input = buffer.getReadPointer(0);
     auto* output = buffer.getWritePointer(0);
+    double output_c[] = {0.0f, 0.0f};
 
     for(int i = 0; i < getBlockSize(); i++)
     {
         auto gain0 = mGain0->get();
         auto gain1 = mGain1->get();
-        output[i] = iir0L->process_sample(input[i]) * gain0 + iir0H->process_sample(input[i]) * gain1;
+        CompF->process_sample(input[i], output_c);
+        output[i] = output_c[0] * gain0 + output_c[1] * gain1;
+        //output[i] = iir0L->process_sample(input[i]) * gain0 + iir0H->process_sample(input[i]) * gain1;
     }
 }
 
