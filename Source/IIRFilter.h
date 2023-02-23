@@ -105,18 +105,31 @@ public:
         A  = new IIRFilter(accumulator, _a);
     }
 
-    void process_sample(double input_data, double* output_data)
+    void process_sample_complementary(double input_data, double* output_data)
     {
         output_data[0] = F->process_sample(input_data);
         output_data[1] = F_->process_sample(input_data);
     }
 
-    void process(double* input, double** output, int block_size)
+    void process_complementary(double* input, double** output, int block_size)
     {
         for (int i = 0; i < block_size; i++)
         {
             output[0][i] = F->process_sample(input[i]);
             output[1][i] = F_->process_sample(input[i]);
+        }
+    }
+
+    double process_sample_allpass(double input_data)
+    {
+        return A->process_sample(input_data);
+    }
+
+    void process_allpass(double* input, double* output, int block_size)
+    {
+        for (int i = 0; i < block_size; i++)
+        {
+            output[i] = A->process_sample(input[i]);
         }
     }
     

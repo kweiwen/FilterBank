@@ -165,7 +165,7 @@ void puannhiAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     {
         auto gain0 = mGain0->get();
         auto gain1 = mGain1->get();
-        CompF->process_sample(input[i], output_c);
+        CompF->process_sample_complementary(input[i], output_c);
         output[i] = output_c[0] * gain0 + output_c[1] * gain1;
         //output[i] = iir0L->process_sample(input[i]) * gain0 + iir0H->process_sample(input[i]) * gain1;
     }
