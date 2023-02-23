@@ -94,17 +94,15 @@ public:
     template <size_t N>
     Complementary(const double(&b)[N], const double(&b_)[N], const double(&_a)[N])
     {
-        F  = new IIRFilter(b, _a);
-        F_ = new IIRFilter(b_, _a);
-
-        accumulator = new double[N]();
-        //negator = new double[N]();
+        double accumulator[N] = { 0.0 };
         for (int i = 0; i < N; i++)
         {
             accumulator[i] = b[i] + b_[i];
         }
 
-        //A  = IIRFilter(accumulator, _a);
+        F  = new IIRFilter(b, _a);
+        F_ = new IIRFilter(b_, _a);
+        A  = new IIRFilter(accumulator, _a);
     }
 
     void process_sample(double input_data, double* output_data)
@@ -126,6 +124,4 @@ private:
     IIRFilter* F;
     IIRFilter* F_;
     IIRFilter* A;
-    double* accumulator;
-    //double* negator;
 };
