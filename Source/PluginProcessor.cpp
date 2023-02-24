@@ -24,6 +24,8 @@ puannhiAudioProcessor::puannhiAudioProcessor()
 {
     addParameter(mGain0 = new juce::AudioParameterFloat("0x00", "Gain0", 0.0f, 1.0f, 0.0f));
     addParameter(mGain1 = new juce::AudioParameterFloat("0x01", "Gain1", 0.0f, 1.0f, 0.0f));
+    addParameter(mGain2 = new juce::AudioParameterFloat("0x02", "Gain2", 0.0f, 1.0f, 0.0f));
+    addParameter(mGain3 = new juce::AudioParameterFloat("0x03", "Gain3", 0.0f, 1.0f, 0.0f));
 }
 
 puannhiAudioProcessor::~puannhiAudioProcessor()
@@ -95,30 +97,29 @@ void puannhiAudioProcessor::changeProgramName (int index, const juce::String& ne
 //==============================================================================
 void puannhiAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
-    double L_b_coefficients[] = {0.00000104697434f, 0.00000418789734f, 0.00000628184601f, 0.00000418789734f, 0.00000104697434f};
-    double H_b_coefficients[] = {0.91159345f, -3.6463738f, 5.4695607f, -3.6463738f, 0.91159345f};
-    
-    double a_coefficients[] = {1.0f, -3.81500325f, 5.46175145f, -3.47773597f, 0.83100453f};
-    
-    //iirL.reset(new IIRFilter[4]{
-    //    IIRFilter(L_b_coefficients, a_coefficients),
-    //    IIRFilter(L_b_coefficients, a_coefficients),
-    //    IIRFilter(L_b_coefficients, a_coefficients),
-    //    IIRFilter(L_b_coefficients, a_coefficients) });
+    // 12dB LinkWitz-Riley Filter(125, 500, 2000
+    // F1  [array([-0.000065853566832, -0.000131707133664, -0.000065853566832]), array([1., -1.96753991575317, 0.967803330020497])]
+    // F2  [array([-0.00100482000787, -0.002009640015741, -0.00100482000787]), array([1., -1.873204415984123, 0.877223696015604])]
+    // F3  [array([-0.013534182630736, -0.027068365261471, -0.013534182630736]), array([1., -1.534653975957921, 0.588790706480864])]
+    // F1_ [array([0.983835811443417, -1.967671622886834, 0.983835811443417]), array([1., -1.96753991575317, 0.967803330020497])]
+    // F2_ [array([0.937607027999932, -1.875214055999864, 0.937607027999932]), array([1., -1.873204415984123, 0.877223696015604])]
+    // F3_ [array([0.780861170609696, -1.561722341219392, 0.780861170609696]), array([1., -1.534653975957921, 0.588790706480864])]
 
-    CompF.reset(new Complementary(L_b_coefficients, H_b_coefficients, a_coefficients));
+    double L1_b_coefficients[] = { -0.000065853566832, -0.000131707133664, -0.000065853566832 };
+    double L2_b_coefficients[] = { -0.00100482000787 , -0.002009640015741, -0.00100482000787 };
+    double L3_b_coefficients[] = { -0.013534182630736, -0.027068365261471, -0.013534182630736 };
 
-    //F1  [array([-0.00100482, -0.00200964, -0.00100482]), array([1., -1.87320442, 0.8772237])]
-    //F2  [array([-0.0037837, -0.0075674, -0.0037837]), array([1., -1.75395293, 0.76908772])]
-    //F3  [array([-0.01353418, -0.02706837, -0.01353418]), array([1., -1.53465398, 0.58879071])]
-    //F1_ [array([0.93760703, -1.87521406, 0.93760703]), array([1., -1.87320442, 0.8772237])]
-    //F2_ [array([0.88076016, -1.76152032, 0.88076016]), array([1., -1.75395293, 0.76908772])]
-    //F3_ [array([0.78086117, -1.56172234, 0.78086117]), array([1., -1.53465398, 0.58879071])]
-    //A1  [array([0.93660221, -1.8772237, 0.93660221]), array([1., -1.87320442, 0.8772237])]
-    //A3  [array([0.76732699, -1.58879071, 0.76732699]), array([1., -1.53465398, 0.58879071])]
+    double H1_b_coefficients[] = { 0.983835811443417, -1.967671622886834,  0.983835811443417 };
+    double H2_b_coefficients[] = { 0.937607027999932, -1.875214055999864,  0.937607027999932 };
+    double H3_b_coefficients[] = { 0.780861170609696, -1.561722341219392,  0.780861170609696 };
 
+    double a1_coefficients[] = { 1.0f , -1.96753991575317 ,  0.967803330020497 };
+    double a2_coefficients[] = { 1.0f , -1.873204415984123,  0.877223696015604 };
+    double a3_coefficients[] = { 1.0f , -1.534653975957921,  0.588790706480864 };
+
+    C1.reset(new Complementary(L1_b_coefficients, H1_b_coefficients, a1_coefficients));
+    C2.reset(new Complementary(L2_b_coefficients, H2_b_coefficients, a2_coefficients));
+    C3.reset(new Complementary(L3_b_coefficients, H3_b_coefficients, a3_coefficients));
 }
 
 void puannhiAudioProcessor::releaseResources()
@@ -159,15 +160,26 @@ void puannhiAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     
     auto* input = buffer.getReadPointer(0);
     auto* output = buffer.getWritePointer(0);
-    double output_c[] = {0.0f, 0.0f};
+    double output_C1[] = {0.0f, 0.0f};
+    double output_C2[] = {0.0f, 0.0f};
+    double output_C3[] = {0.0f, 0.0f};
 
     for(int i = 0; i < getBlockSize(); i++)
     {
         auto gain0 = mGain0->get();
         auto gain1 = mGain1->get();
-        CompF->process_sample_complementary(input[i], output_c);
-        output[i] = output_c[0] * gain0 + output_c[1] * gain1;
-        //output[i] = iir0L->process_sample(input[i]) * gain0 + iir0H->process_sample(input[i]) * gain1;
+        auto gain2 = mGain2->get();
+        auto gain3 = mGain3->get();
+        
+        C2->process_sample_complementary(input[i], output_C2);
+
+        auto A31 = C3->process_sample_allpass(output_C2[0]);
+        auto A11 = C1->process_sample_allpass(output_C2[1]);
+
+        C1->process_sample_complementary(A31, output_C1);
+        C3->process_sample_complementary(A11, output_C3);
+
+        output[i] = output_C1[0] * gain0 + output_C1[1] * gain1 + output_C3[0] * gain2 + output_C3[1] * gain3;
     }
 }
 
