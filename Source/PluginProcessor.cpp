@@ -22,10 +22,10 @@ puannhiAudioProcessor::puannhiAudioProcessor()
                        )
 #endif
 {
-    addParameter(mGain0 = new juce::AudioParameterFloat("0x00", "Gain0", 0.0f, 1.0f, 0.0f));
-    addParameter(mGain1 = new juce::AudioParameterFloat("0x01", "Gain1", 0.0f, 1.0f, 0.0f));
-    addParameter(mGain2 = new juce::AudioParameterFloat("0x02", "Gain2", 0.0f, 1.0f, 0.0f));
-    addParameter(mGain3 = new juce::AudioParameterFloat("0x03", "Gain3", 0.0f, 1.0f, 0.0f));
+    addParameter(mGain0 = new juce::AudioParameterFloat("0x00", "band 1", 0.0f, 1.0f, 0.0f));
+    addParameter(mGain1 = new juce::AudioParameterFloat("0x01", "band 2", 0.0f, 1.0f, 0.0f));
+    addParameter(mGain2 = new juce::AudioParameterFloat("0x02", "band 3", 0.0f, 1.0f, 0.0f));
+    addParameter(mGain3 = new juce::AudioParameterFloat("0x03", "band 4", 0.0f, 1.0f, 0.0f));
 }
 
 puannhiAudioProcessor::~puannhiAudioProcessor()
@@ -97,7 +97,7 @@ void puannhiAudioProcessor::changeProgramName (int index, const juce::String& ne
 //==============================================================================
 void puannhiAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // 12dB LinkWitz-Riley Filter(125, 500, 2000
+    // 12dB LinkWitz-Riley Filter(125, 500, 2000)
     // F1  [array([-0.000065853566832, -0.000131707133664, -0.000065853566832]), array([1., -1.96753991575317, 0.967803330020497])]
     // F2  [array([-0.00100482000787, -0.002009640015741, -0.00100482000787]), array([1., -1.873204415984123, 0.877223696015604])]
     // F3  [array([-0.013534182630736, -0.027068365261471, -0.013534182630736]), array([1., -1.534653975957921, 0.588790706480864])]
